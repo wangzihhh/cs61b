@@ -113,13 +113,103 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        board.setViewingPerspective(side);
+        for (int c = 0; c < board.size(); c = c + 1){
+            boolean if_change = tilt_for_column(c);
+            if (if_change){
+                changed = true;
+            }
+        }
         checkGameOver();
         if (changed) {
             setChanged();
         }
+        board.setViewingPerspective(Side.NORTH);
         return changed;
     }
+
+
+
+
+    public boolean tilt_for_column(int c){
+        boolean changed = false;
+        int row_already_merge = -1;
+        for(int r = 3; r >= 0; r = r-1){
+            if (r==3){
+                continue;
+            }
+            if (board.tile(c,r) == null){
+                continue;
+            }
+            Tile t = board.tile(c,r);
+            changed = (slide_without_merge(c,r) != r);
+            int target_row = slide_with_merge(c,r);
+            if (target_row != row_already_merge){
+                boolean decision = board.move(c, target_row,t);
+                if (decision){
+                    score = score + board.tile(c,target_row).value();
+                    row_already_merge = target_row;
+                    changed = true;
+                }
+            }else {
+                board.move(c,slide_without_merge(c,r),t);
+            }
+            }
+        return changed;
+        }
+
+
+
+
+
+
+
+    /** check if the tile which is above (c,r) tile is empty */
+    public boolean up_is_empty(int c,int r){
+        if (r == 3){
+            return  false;
+        } else{
+            return  board.tile(c,r+1) == null;
+        }
+    }
+
+    /** Suppose we put a tile in (c,r), this function return the row value that the tile can
+     * slide to whiling tilting without considering merging.
+     */
+    public int slide_without_merge(int c, int r){
+        if (r == 3){
+            return r;
+        }
+        else {
+            if (up_is_empty(c,r)){
+                return  slide_without_merge(c,r+1);
+            }
+            else{
+                return r;
+            }
+        }
+    }
+
+
+    public int slide_with_merge(int c, int r){
+        int target_without_merge = slide_without_merge(c,r);
+        if (target_without_merge == 3){
+            return target_without_merge;
+        }else{
+            if (board.tile(c,r).value() == board.tile(c, target_without_merge+1).value()){
+                return target_without_merge + 1;
+            } else{
+                return target_without_merge;
+            }
+        }
+    }
+
+
+
+
+
+
+
 
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
@@ -138,9 +228,25 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        int size = b.size();
+        for (int col = 0 ; col < size; col = col + 1){
+            for (int row = 0; row < size; row = row + 1){
+                if (isempty(b.tile(col, row))){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
+    /** helper function to check wheather a specific tile is empty */
+    public static boolean isempty(Tile t){
+        if (t == null){
+            return true;
+        } else{
+        return false;
+        }
+    }
     /**
      * Returns true if any tile is equal to the maximum valid value.
      * Maximum valid value is given by MAX_PIECE. Note that
@@ -148,9 +254,29 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        int size = b.size();
+        for(int col = 0; col < size; col = col + 1){
+            for (int row = 0; row < size; row = row + 1){
+                if (is_max_piece(b.tile(col, row))){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
+    /** helper function to check wheather the value of a tile
+     * is equal to max_piece
+     * @param t
+     * @return
+     */
+    public  static  boolean is_max_piece(Tile t){
+        if (t == null || t.value() < MAX_PIECE){
+            return  false;
+        } else{
+            return  true;
+        }
+    }
     /**
      * Returns true if there are any valid moves on the board.
      * There are two ways that there can be valid moves:
@@ -159,9 +285,36 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
-        return false;
+        if (emptySpaceExists(b)){
+            return  true;
+        } else{
+            return two_adjacent_samevalue(b);
+        }
     }
 
+    /** this function is only used to a board without empty sile!!!!
+     * test whether in a board without empty
+    there are two adjacent tiles with the same value */
+
+    public static boolean two_adjacent_samevalue(Board b){
+        int size = b.size();
+        /** test adjacent in each column */
+        for (int col = 0; col < size; col = col + 1 ){
+            for (int row = 0; row < (size-1); row = row + 1){
+               if (b.tile(col, row).value() == b.tile(col, (row + 1)).value()){
+                   return true;
+                }
+            }
+        }
+        for (int row = 0; row < size; row = row + 1){
+            for (int col = 0; col < (size - 1); col = col + 1){
+                if (b.tile(col, row).value() == b.tile((col + 1),row ).value()){
+                    return  true;
+                }
+            }
+        }
+        return  false;
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */
