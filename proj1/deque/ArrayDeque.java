@@ -1,6 +1,6 @@
 package deque;
 
-import org.checkerframework.checker.units.qual.A;
+
 
 public class ArrayDeque<T> {
     private int size;
@@ -164,12 +164,6 @@ public class ArrayDeque<T> {
         return items[index-(items.length-front)];
     }
 
-    public static void main(String[] args) {
-        ArrayDeque<Integer> a = new ArrayDeque<>();
-        for (int i = 0; i <  5; i += 1){
-            a.addFirst(i);
-        }
-        System.out.println(a.get(0));
-    }
+
 
 }
