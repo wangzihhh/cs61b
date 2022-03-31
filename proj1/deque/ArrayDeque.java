@@ -1,4 +1,7 @@
 package deque;
+
+import org.checkerframework.checker.units.qual.A;
+
 public class ArrayDeque<T> {
     private int size;
     private T[] items;
@@ -28,7 +31,7 @@ public class ArrayDeque<T> {
         if (nextFirst == items.length-1){
             return 0;
         }
-        return nextFirst-1;
+        return nextFirst+1;
     }
 
     private int getBackIndex(){
@@ -161,6 +164,12 @@ public class ArrayDeque<T> {
         return items[index-(items.length-front)];
     }
 
-
+    public static void main(String[] args) {
+        ArrayDeque<Integer> a = new ArrayDeque<>();
+        for (int i = 0; i <  5; i += 1){
+            a.addFirst(i);
+        }
+        System.out.println(a.get(0));
+    }
 
 }
