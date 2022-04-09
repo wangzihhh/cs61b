@@ -1,36 +1,12 @@
 package deque;
 
-
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Iterable<T>, Deque<T>{
+public class ArrayDequeNoResize<T> {
     private int size;
     private T[] items;
     private int nextFirst;
     private int nextLast;
-
-
-
-    // ALL HELPER METHOD !!!!
-
-    /**
-     * check if the items variable need to be resized larger
-     * otherwise we can not update the nextFirst or nextLast
-     * value in this current array
-     */
-    private boolean NeedLarger() {
-        if (nextFirst == 0 && nextLast == items.length - 1) {
-            return true;
-        }
-        if (nextFirst > nextLast && nextFirst - nextLast == 1){
-            return true;
-        }
-        return false;
-    }
-
-    private boolean NeedSmaller(){
-        return  (items.length > 16 && size < items.length/4);
-    }
 
     private int getFrontIndex(){
         if (nextFirst == items.length-1){
@@ -45,30 +21,6 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T>{
         }
         return nextLast-1;
     }
-
-    private void resize(int capacity){
-        T[] tempt = (T[]) new Object[capacity];
-        int front = getFrontIndex();
-        int back = getBackIndex();
-        int current_length = items.length;
-        if (front < back){
-            System.arraycopy(items,front,tempt,0,size);
-            items = tempt;
-            nextFirst = items.length-1;
-            nextLast = size;
-            return;
-        }
-        System.arraycopy(items,front,tempt,0,current_length-front);
-        System.arraycopy(items,0,tempt,current_length-front,back+1);
-        items = tempt;
-        nextFirst = items.length-1;
-        nextLast = size;
-        return;
-    }
-
-    /**update nextLast variable after we call addLast method
-     * for the object whose items need NOT Enlarger !!!!
-     */
 
     private void updateNextLast(){
         if (nextLast == items.length-1){
@@ -87,11 +39,8 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T>{
     }
 
 
-    // START TO IMPLEMENT!!!!
-
-    // create a empty arraydeque.
-    public ArrayDeque() {
-        items = (T[]) new Object[8];
+    public ArrayDequeNoResize() {
+        items = (T[]) new Object[10000];
         size = 0;
         nextLast = 5;
         nextFirst = 4;
@@ -101,22 +50,20 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T>{
         return size;
     }
 
-
-
+    public boolean isEmpty(){
+        if (size() == 0){
+            return true;
+        }
+        return false;
+    }
 
     public void addFirst(T item){
-        if (NeedLarger()){
-            resize(2* items.length);
-        }
         items[nextFirst] = item;
         updateNextFirst();
         size += 1;
     }
 
     public void addLast(T item){
-        if (NeedLarger()){
-            resize(2* items.length);
-        }
         items[nextLast] = item;
         updateNextLast();
         size += 1;
@@ -131,9 +78,6 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T>{
         items[front] = null;
         nextFirst = front;
         size -= 1;
-        if (NeedSmaller()){
-            resize(items.length/4);
-        }
         return x;
     }
 
@@ -146,9 +90,6 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T>{
         items[back] = null;
         nextLast = back;
         size -= 1;
-        if (NeedSmaller()){
-            resize(items.length/4);
-        }
         return x;
     }
 
@@ -168,13 +109,6 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T>{
             return items[front+index];
         }
         return items[index-(items.length-front)];
-    }
-
-    public void printDeque(){
-        for(int i = 0; i < size(); i += 1){
-            System.out.print(get(i) + " ");
-        }
-        System.out.println();
     }
 
     public Iterator<T> iterator(){
@@ -202,23 +136,8 @@ public class ArrayDeque<T> implements Iterable<T>, Deque<T>{
         }
     }
 
-    public boolean equals(Object o){
-        if (this == o){
-            return true;
-        }
-        if (!(o instanceof ArrayDeque)){
-            return false;
-        }
-        ArrayDeque<T> a = (ArrayDeque<T>) o;
-        if (this.size() != a.size()){
-            return false;
-        }
-        for (int i = 0; i < size; i += 1){
-            if (!get(i).equals(a.get(i))){
-                return false;
-            }
-        }
-        return true;
-    }
+
+
+
 
 }

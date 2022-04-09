@@ -1,6 +1,8 @@
 package deque;
 
-public class LinkedListDeque<T> {
+import java.util.Iterator;
+
+public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
 
     private  class Dnode {
         public T item;
@@ -17,6 +19,8 @@ public class LinkedListDeque<T> {
 
     private int size;
     private Dnode sentinel;
+
+
 
     // create empty Deque
     public LinkedListDeque() {
@@ -39,13 +43,7 @@ public class LinkedListDeque<T> {
         sentinel.prev = sentinel.prev.next;
     }
 
-    // return whether a list is empty
-    public boolean isEmpty() {
-        if (sentinel.next == sentinel) {
-            return true;
-        }
-        return false;
-    }
+
 
     //return the size of the list.
     public int size() {
@@ -118,5 +116,50 @@ public class LinkedListDeque<T> {
         return tempt.getRecursive(index-1);
     }
 
+    public Iterator<T> iterator(){
+        return new LinkedListDequeIterator();
+    }
+
+    private class LinkedListDequeIterator implements Iterator<T>{
+        private int wizPos;
+
+        public LinkedListDequeIterator(){
+            wizPos = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (wizPos < size){
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public T next(){
+            T returnItem = get(wizPos);
+            wizPos += 1;
+            return returnItem;
+        }
+    }
+
+    public boolean equals(Object o){
+        if (this == o){
+            return true;
+        }
+        if (!(o instanceof LinkedListDeque)){
+            return false;
+        }
+        LinkedListDeque<T> L = (LinkedListDeque<T>) o;
+        if (this.size() != L.size()){
+            return false;
+        }
+        for (int i = 0; i < size; i += 1){
+            if (!this.get(i).equals(L.get(i))){
+                return false;
+            }
+        }
+        return true;
+    }
     
 }
