@@ -102,5 +102,18 @@ public class ArrayDequeTest {
             assertEquals(10, test);
         }
 
+        @Test
+        public void RemoveFirstTest(){
+            ArrayDeque<Integer> a = new ArrayDeque<>();
+            for (int i = 0; i < 100000; i += 1){
+                a.addFirst(i);
+            }
+            for (int j = 0; j < 10000; j += 1){
+                a.removeLast();
+            }
+            int removeelement = a.removeFirst();
+            assertEquals(99999,removeelement);
+        }
+
     }
 }
